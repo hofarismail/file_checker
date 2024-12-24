@@ -6,6 +6,8 @@
 -   **Word Documents**: Memeriksa apakah file adalah dokumen Word yang valid, baik dalam format `.doc` (Word 97-2003) maupun `.docx` (Word 2007+).
 -   **Images**: Memeriksa apakah file adalah gambar yang valid (JPEG, PNG, GIF, WebP).
 
+![File Checker](file_checker.png)
+
 ## Fitur Utama
 
 1. **Validasi Tipe File**:
@@ -58,7 +60,7 @@
         ```php
         $foldersToCheck = [
             __DIR__ . DIRECTORY_SEPARATOR . 'put_your_files_here',
-            'C:' . DIRECTORY_SEPARATOR . 'Downloads'
+            'F:' . DIRECTORY_SEPARATOR . 'Downloads'
         ];
         ```
 

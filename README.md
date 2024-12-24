@@ -60,7 +60,7 @@
         ```php
         $foldersToCheck = [
             __DIR__ . DIRECTORY_SEPARATOR . 'put_your_files_here',
-            'F:' . DIRECTORY_SEPARATOR . 'Downloads'
+            'C:' . DIRECTORY_SEPARATOR . 'Downloads'
         ];
         ```
 

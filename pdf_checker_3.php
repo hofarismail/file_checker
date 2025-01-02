@@ -122,6 +122,8 @@ function isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)
     if ($httpCode === 200) {
         $result = json_decode($response, true);
 
+        // print_r($result);
+
         // Cek apakah file aman
         if (
             isset($result['data']['attributes']['last_analysis_stats']['malicious']) &&

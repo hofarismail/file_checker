@@ -184,7 +184,7 @@ function checkFilesInFolder($folderPath)
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
         // Pastikan hanya file dengan ekstensi yang valid yang diproses
-        if (!in_array($extension, ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+        if (!in_array($extension, ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'txt'])) {
             echo "File '$filePath' tidak didukung (bukan PDF, Word, atau gambar). Dilewati.<br/>";
             continue;
         }
@@ -192,7 +192,8 @@ function checkFilesInFolder($folderPath)
         echo "Memeriksa file: '$file'...<br/>";
 
         // Ganti dengan API Key VirusTotal Anda
-        $apiKeyVirusTotal = getenv('VIRUSTOTAL_API_KEY');
+        $apiKeyVirusTotal = $_ENV['VIRUSTOTAL_API_KEY'];
+        // var_dump($apiKeyVirusTotal);
 
         // Validasi file dengan VirusTotal
         if (isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)) {

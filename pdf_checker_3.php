@@ -4,6 +4,11 @@ require_once 'vendor/autoload.php';
 
 use PhpOffice\PhpWord\IOFactory;
 use setasign\Fpdi\Fpdi;
+use Dotenv\Dotenv;
+
+// Inisialisasi dotenv
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 // Fungsi untuk memeriksa apakah file PDF valid
 function isPdfValidWithFpdi($filePath)
@@ -134,6 +139,28 @@ function isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)
     }
 }
 
+function scanFileForMalware($filePath)
+{
+    $patterns = [
+        '/base64_decode/',     // Mendeteksi encoding base64
+        '/eval\(/',            // Mendeteksi fungsi eval
+        '/shell_exec\(/',      // Mendeteksi eksekusi shell
+        '/<?php.*system\(/',   // Mendeteksi eksekusi sistem
+    ];
+
+    $content = file_get_contents($filePath);
+
+    foreach ($patterns as $pattern) {
+        if (preg_match($pattern, $content)) {
+            echo "File '$filePath' kemungkinan mengandung kode mencurigakan.<br/>";
+            return false;
+        }
+    }
+
+    echo "File '$filePath' aman.<br/>";
+    return true;
+}
+
 // Fungsi untuk memeriksa folder dan validasi file PDF, Word, dan gambar
 function checkFilesInFolder($folderPath)
 {
@@ -165,10 +192,14 @@ function checkFilesInFolder($folderPath)
         echo "Memeriksa file: '$file'...<br/>";
 
         // Ganti dengan API Key VirusTotal Anda
-        $apiKeyVirusTotal = '1c26f73724c127a477db1c9d75332851abbe7074ee150fa842dfdc2c63ec9c92';
+        $apiKeyVirusTotal = getenv('VIRUSTOTAL_API_KEY');
 
         // Validasi file dengan VirusTotal
         if (isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)) {
+            $validCount++;
+        }
+        // Validasi malware
+        elseif (scanFileForMalware($filePath)) {
             $validCount++;
         }
         // Validasi file PDF

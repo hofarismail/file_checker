@@ -96,9 +96,6 @@ function isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)
     // URL API VirusTotal
     $url = 'https://www.virustotal.com/api/v3/files';
 
-    // Baca konten file
-    // $fileContent = file_get_contents($filePath);
-
     // Kirim file ke VirusTotal
     $curl = curl_init();
     curl_setopt_array($curl, [
@@ -122,19 +119,48 @@ function isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)
     if ($httpCode === 200) {
         $result = json_decode($response, true);
 
-        // print_r($result);
+        // Ambil URL analisis
+        if (isset($result['data']['links']['self'])) {
+            $analysisUrl = $result['data']['links']['self'];
 
-        // Cek apakah file aman
-        if (
-            isset($result['data']['attributes']['last_analysis_stats']['malicious']) &&
-            $result['data']['attributes']['last_analysis_stats']['malicious'] > 0
-        ) {
-            echo "File '$filePath' terdeteksi berbahaya oleh VirusTotal.<br/>";
+            // Lakukan permintaan ke URL analisis
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => $analysisUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => [
+                    'x-apikey: ' . $apiKeyVirusTotal,
+                ],
+            ]);
+
+            $analysisResponse = curl_exec($curl);
+            $analysisHttpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+
+            if ($analysisHttpCode === 200) {
+                $analysisResult = json_decode($analysisResponse, true);
+
+                // print_r($analysisResult); // Menampilkan hasil analisis
+
+                // Cek apakah file aman
+                if (
+                    isset($analysisResult['data']['attributes']['stats']['malicious']) &&
+                    $analysisResult['data']['attributes']['stats']['malicious'] > 0
+                ) {
+                    echo "File '$filePath' terdeteksi berbahaya.<br/>";
+                    return false;
+                }
+
+                echo "File '$filePath' aman.<br/>";
+                return true;
+            } else {
+                echo "Gagal mendapatkan hasil analisis dari URL: $analysisUrl<br/>";
+                return false;
+            }
+        } else {
+            echo "URL analisis tidak ditemukan dalam respons.<br/>";
             return false;
         }
-
-        echo "File '$filePath' aman menurut VirusTotal.<br/>";
-        return true;
     } else {
         echo "Gagal memindai file '$filePath' dengan VirusTotal.<br/>";
         return false;

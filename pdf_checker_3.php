@@ -196,11 +196,13 @@ function checkFilesInFolder($folderPath)
         // var_dump($apiKeyVirusTotal);
 
         // Validasi file dengan VirusTotal
-        if (isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)) {
-            $validCount++;
+        if (!isFileSafeWithVirusTotal($filePath, $apiKeyVirusTotal)) {
+            // $validCount++;
+            $invalidCount++;
         }
+
         // Validasi malware
-        elseif (scanFileForMalware($filePath)) {
+        if (scanFileForMalware($filePath)) {
             $validCount++;
         }
         // Validasi file PDF
